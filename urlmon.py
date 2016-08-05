@@ -16,6 +16,7 @@ import configparser
 import git
 import datetime
 import shutil
+import sys
 
 # 解析配置文件
 config = configparser.ConfigParser()
