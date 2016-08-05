@@ -132,9 +132,12 @@ def gitOps(tmp_dir=tmp_dir, telegraf_dir=telegraf_dir, telegraf_git=telegraf_git
 			print(g.status())
 		g.push("origin", monit_node)
 	
-def run(runtype="time",oid=None):
+def run(runtype="time",oid=""):
 	if runtype == "time":
-		data = getObjByTime(start_str)
+		if oid != "":
+			data = getObjByTime(oid)
+		else:
+			data = getObjByTime(start_str)
 	else:
 		data = getObjById(oid)
 	if data:
@@ -144,4 +147,9 @@ def run(runtype="time",oid=None):
 	gitOps()
 
 if __name__ == '__main__':
-	run()
+	if len(sys.argv) < 2:
+		run()
+	elif sys.argv[1] == "time":
+		run("time", sys.argv[2])
+	else:
+		run("id", sys.argv[1])
