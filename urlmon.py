@@ -40,6 +40,9 @@ now = datetime.datetime.now()
 start = now- datetime.timedelta(seconds=interval)
 start_str = start.strftime('%Y-%m-%d %H:%M:%S')
 
+if not os.path.isdir(tmp_dir):
+	os.mkdir(tmp_dir)
+
 def getObjByTime(start):
 	oql = 'SELECT CMDBChangeOp AS c WHERE c.objclass="Url" AND date>"' + start + '"'
 	url_obj = itop.get('CMDBChangeOp', oql)
