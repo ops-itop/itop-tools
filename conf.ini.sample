@@ -6,5 +6,6 @@ passwd = admin
 interval = 2
 
 [telegraf]
+tmpdir = tmp
 giturl = http://username:password@git.xxx.cn/user/repo.git
 gitdir = telegraf-url

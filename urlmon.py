@@ -125,7 +125,7 @@ def gitOps(tmp_dir=tmp_dir, telegraf_dir=telegraf_dir, telegraf_git=telegraf_git
 	
 def run(runtype="time",oid=None):
 	if runtype == "time":
-		data = getObjByTime(runtype)
+		data = getObjByTime(start_str)
 	else:
 		data = getObjById(oid)
 	if data:
@@ -135,4 +135,4 @@ def run(runtype="time",oid=None):
 	gitOps()
 
 if __name__ == '__main__':
-	run("id", "14")
+	run()
