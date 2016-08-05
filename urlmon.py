@@ -17,6 +17,7 @@ import git
 import datetime
 import shutil
 import sys
+import glob
 
 # 解析配置文件
 config = configparser.ConfigParser()
@@ -43,8 +44,23 @@ start_str = start.strftime('%Y-%m-%d %H:%M:%S')
 if not os.path.isdir(tmp_dir):
 	os.mkdir(tmp_dir)
 
-def getObjByTime(start):
-	oql = 'SELECT CMDBChangeOp AS c WHERE c.objclass="Url" AND date>"' + start + '"'
+def getDeleted(start_str):
+	oql = 'SELECT CMDBChangeOpDelete AS c WHERE c.objclass="FunctionalCI" AND c.date > "' + start_str + '"'
+	dels = itop.get('CMDBChangeOpDelete', oql)
+	try:
+		deleted = dels['objects']
+	except:
+		print(dels)
+		sys.exit()
+	
+	objkeys = []
+	if deleted:
+		for k,v in deleted.items():
+			objkeys.append(v['fields']['objkey'])
+	return(objkeys)
+
+def getObjByTime(start_str):
+	oql = 'SELECT CMDBChangeOp AS c WHERE c.objclass="Url" AND c.date>"' + start_str + '"'
 	url_obj = itop.get('CMDBChangeOp', oql)
 	try:
 		url = url_obj['objects']
@@ -73,8 +89,8 @@ def writeConfFile(f, response_timeout = "15s", follow_redirects = "true", insecu
 	if not os.path.isdir(filedir):
 		os.makedirs(filedir)
 
-	filepath = os.path.join(tmp_dir, f['monitor_node'], f['applicationsolution_name'] + "_" + \
-			f['url'].replace("://", "_").replace("/","_") + ".conf")
+	filepath = os.path.join(tmp_dir, f['monitor_node'], "id-" + f['id'] + "." + f['applicationsolution_name'] + \
+			"_" + f['url'].replace("://", "_").replace("/","_") + ".conf")
 
 	headers = f['headers'].replace('\r\n', '\n').replace(': ', ':').split('\n')
 	h = []
@@ -97,7 +113,7 @@ def writeConfFile(f, response_timeout = "15s", follow_redirects = "true", insecu
 				"\tinsecure_skip_verify = " + insecure_skip_verify + '\n' + \
 				"\t[inputs.url_monitor.headers]\n\t\t" + h_str + '\n')
 
-def gitOps(tmp_dir=tmp_dir, telegraf_dir=telegraf_dir, telegraf_git=telegraf_git):
+def gitOps(delobj=[], tmp_dir=tmp_dir, telegraf_dir=telegraf_dir, telegraf_git=telegraf_git):
 	if not os.path.isdir(telegraf_dir):
 		repo = git.Repo.clone_from(telegraf_git, telegraf_dir)
 	else:
@@ -117,13 +133,22 @@ def gitOps(tmp_dir=tmp_dir, telegraf_dir=telegraf_dir, telegraf_git=telegraf_git
 			g.checkout(b=monit_node)
 		
 		commit = ""
+
+		for obj in delobj:
+			#print(obj)
+			delfile = glob.glob(os.path.join(telegraf_dir, monit_node, "id-" + obj + ".*"))
+			if delfile:
+				os.remove(delfile[0])
+				commit = "delete " + delfile[0] + "\n"
+			#print(delfile)
+
 		for item in os.listdir(os.path.join(tmp_dir, d)):
 			dest = os.path.join(telegraf_dir, d)
 			destfile = os.path.join(dest, item)
 			if os.path.isfile(destfile):
 				os.remove(destfile)
 			shutil.move(os.path.join(tmp_dir, d, item), dest)
-			commit = commit + d + "/" + item + "\n"
+			commit = commit + "update " + d + "/" + item + "\n"
 		
 		g.add("--all")
 		try:
@@ -136,15 +161,18 @@ def run(runtype="time",oid=""):
 	if runtype == "time":
 		if oid != "":
 			data = getObjByTime(oid)
+			delobj = getDeleted(oid)
 		else:
 			data = getObjByTime(start_str)
+			delobj = getDeleted(start_str)
 	else:
 		data = getObjById(oid)
 	if data:
 		for k,v in data.items():
 			f = v['fields']
+			f['id'] = v['key']
 			writeConfFile(f)
-	gitOps()
+	gitOps(delobj)
 
 if __name__ == '__main__':
 	if len(sys.argv) < 2:
