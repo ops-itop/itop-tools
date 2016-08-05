@@ -1,0 +1,10 @@
+[itop]
+api = http://itop.cn/webservices/rest.php
+version = 1.3
+user = admin
+passwd = admin
+interval = 2
+
+[telegraf]
+giturl = http://username:password@git.xxx.cn/user/repo.git
+gitdir = telegraf-url
