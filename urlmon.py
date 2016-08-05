@@ -41,7 +41,12 @@ start_str = start.strftime('%Y-%m-%d %H:%M:%S')
 
 def getObjByTime(start):
 	oql = 'SELECT CMDBChangeOp AS c WHERE c.objclass="Url" AND date>"' + start + '"'
-	url = itop.get('CMDBChangeOp', oql)['objects']
+	url_obj = itop.get('CMDBChangeOp', oql)
+	try:
+		url = url_obj['objects']
+	except:
+		print(url_obj)
+		sys.exit()
 
 	objkeys = []
 	if url:
