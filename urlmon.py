@@ -100,6 +100,9 @@ def writeConfFile(f, response_timeout = "15s", follow_redirects = "true", insecu
 			h.append(header.replace(":", ' = "', 1) + '"')
 	h_str = "\n\t\t".join(h)
 	
+	timeout = f['timeout']
+	if timeout == "":
+		timeout = "1"
 	with open(filepath, 'w') as fi:
 		fi.write("[[inputs.url_monitor]]\n" + \
 				"\tapp = " + '"' +  f['applicationsolution_name'] + '"\n' + \
@@ -109,7 +112,7 @@ def writeConfFile(f, response_timeout = "15s", follow_redirects = "true", insecu
 				"\trequire_str = " + "'" + f['require_str'] + "'\n" + \
 				"\trequire_code = " + "'" + f['require_code'] + "'\n" + \
 				"\tfailed_count = " + f['failed_count'] + '\n' + \
-				"\tfailed_timeout = " + str("%.2f" % float(f['timeout'])) + '\n' + \
+				"\tfailed_timeout = " + str("%.2f" % float(timeout)) + '\n' + \
 				"\tfollow_redirects = " + follow_redirects + '\n' + \
 				"\tbody = " + "'" + f['body'] + "'\n" + \
 				"\tinsecure_skip_verify = " + insecure_skip_verify + '\n' + \
