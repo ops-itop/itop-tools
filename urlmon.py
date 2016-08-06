@@ -119,7 +119,6 @@ def gitOps(delobj=[], tmp_dir=tmp_dir, telegraf_dir=telegraf_dir, telegraf_git=t
 		repo = git.Repo.clone_from(telegraf_git, telegraf_dir)
 	else:
 		repo = git.Repo(telegraf_dir)
-		repo.git.pull()
 	g = repo.git
 
 	dirs = os.listdir(tmp_dir)
@@ -134,6 +133,7 @@ def gitOps(delobj=[], tmp_dir=tmp_dir, telegraf_dir=telegraf_dir, telegraf_git=t
 		except:
 			g.checkout(b=monit_node)
 		
+		g.pull("origin")
 		commit = ""
 
 		for obj in delobj:
