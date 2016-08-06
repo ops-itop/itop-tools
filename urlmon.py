@@ -160,6 +160,7 @@ def gitOps(delobj=[], tmp_dir=tmp_dir, telegraf_dir=telegraf_dir, telegraf_git=t
 		g.push("origin", monit_node)
 	
 def run(runtype="time",oid=""):
+	delobj = []
 	if runtype == "time":
 		if oid != "":
 			data = getObjByTime(oid)
