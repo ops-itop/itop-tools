@@ -31,8 +31,8 @@ itop_pwd=config.get("itop", "passwd")
 # 执行频率
 interval = int(config.get("itop", "interval")) * 60 + 5
 
-tmp_dir = config.get("telegraf", "tmpdir")
-telegraf_dir = config.get("telegraf", "gitdir")
+tmp_dir = os.path.join(path, config.get("telegraf", "tmpdir"))
+telegraf_dir = os.path.join(path, config.get("telegraf", "gitdir"))
 telegraf_git = config.get("telegraf", "giturl")
 
 itop = itopy.Api()
