@@ -96,7 +96,8 @@ def writeConfFile(f, response_timeout = "15s", follow_redirects = "true", insecu
 	headers = f['headers'].replace('\r\n', '\n').replace(': ', ':').split('\n')
 	h = []
 	for header in headers:
-		h.append(header.replace(":", ' = "', 1) + '"')
+		if header != "":
+			h.append(header.replace(":", ' = "', 1) + '"')
 	h_str = "\n\t\t".join(h)
 	
 	with open(filepath, 'w') as fi:
@@ -108,7 +109,7 @@ def writeConfFile(f, response_timeout = "15s", follow_redirects = "true", insecu
 				"\trequire_str = " + "'" + f['require_str'] + "'\n" + \
 				"\trequire_code = " + "'" + f['require_code'] + "'\n" + \
 				"\tfailed_count = " + f['failed_count'] + '\n' + \
-				"\tfailed_timeout = " + f['timeout'] + '\n' + \
+				"\tfailed_timeout = " + str("%.2f" % float(f['timeout'])) + '\n' + \
 				"\tfollow_redirects = " + follow_redirects + '\n' + \
 				"\tbody = " + "'" + f['body'] + "'\n" + \
 				"\tinsecure_skip_verify = " + insecure_skip_verify + '\n' + \
