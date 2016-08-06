@@ -107,6 +107,7 @@ def writeConfFile(f, response_timeout = "15s", follow_redirects = "true", insecu
 		fi.write("[[inputs.url_monitor]]\n" + \
 				"\tapp = " + '"' +  f['applicationsolution_name'] + '"\n' + \
 				"\taddress = " + '"' + f['url'] + '"\n' + \
+				"\tinterval = " + '"' + f['interval'] + 's"\n' + \
 				"\tresponse_timeout = \"" + response_timeout + '"\n' + \
 				"\tmethod = " + '"' + f['method'] + '"\n' + \
 				"\trequire_str = " + "'" + f['require_str'] + "'\n" + \
