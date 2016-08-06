@@ -133,7 +133,7 @@ def gitOps(delobj=[], tmp_dir=tmp_dir, telegraf_dir=telegraf_dir, telegraf_git=t
 		except:
 			g.checkout(b=monit_node)
 		
-		g.pull("origin")
+		g.pull("origin", monit_node)
 		commit = ""
 
 		for obj in delobj:
