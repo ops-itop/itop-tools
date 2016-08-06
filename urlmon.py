@@ -118,6 +118,7 @@ def gitOps(delobj=[], tmp_dir=tmp_dir, telegraf_dir=telegraf_dir, telegraf_git=t
 		repo = git.Repo.clone_from(telegraf_git, telegraf_dir)
 	else:
 		repo = git.Repo(telegraf_dir)
+		repo.git.pull()
 	g = repo.git
 
 	dirs = os.listdir(tmp_dir)
