@@ -20,8 +20,9 @@ import sys
 import glob
 
 # 解析配置文件
+path = os.path.dirname(os.path.abspath(__file__))
 config = configparser.ConfigParser()
-config.read("conf.ini")   # 注意这里必须是绝对路径
+config.read(os.path.join(path, "conf.ini"))   # 注意这里必须是绝对路径
  
 itop_api=config.get("itop", "api")
 itop_api_version=config.get("itop", "version")
