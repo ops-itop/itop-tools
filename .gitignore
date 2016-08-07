@@ -2,3 +2,4 @@
 *.txt
 telegraf-url
 *.log
+tmp
