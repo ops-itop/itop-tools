@@ -46,18 +46,30 @@ if not os.path.isdir(tmp_dir):
 	os.mkdir(tmp_dir)
 
 def getDeleted(start_str):
-	oql = 'SELECT CMDBChangeOpDelete AS c WHERE c.objclass="FunctionalCI" AND c.date > "' + start_str + '"'
-	dels = itop.get('CMDBChangeOpDelete', oql)
+	del_oql = 'SELECT CMDBChangeOpDelete AS c WHERE c.objclass="FunctionalCI" AND c.date > "' + start_str + '"'
+	dels = itop.get('CMDBChangeOpDelete', del_oql)
 	try:
 		deleted = dels['objects']
 	except:
 		print(dels)
-		sys.exit()
 	
 	objkeys = []
 	if deleted:
 		for k,v in deleted.items():
 			objkeys.append(v['fields']['objkey'])
+
+	mod_oql = 'SELECT CMDBChangeOpSetAttributeScalar AS c WHERE c.objclass="Url" AND c.attcode="monitor_node" ' + \
+			'AND date > "' + start_str + '"'
+	mods = itop.get('CMDBChangeOpSetAttributeScalar', mod_oql)
+	try:
+		modified = mods['objects']
+	except:
+		print(mods)
+
+	if modified:
+		for k,v in modified.items():
+			objkeys.append(v['fields']['objkey'])
+
 	return(objkeys)
 
 def getObjByTime(start_str):
@@ -90,8 +102,7 @@ def writeConfFile(f, response_timeout = "15s", follow_redirects = "true", insecu
 	if not os.path.isdir(filedir):
 		os.makedirs(filedir)
 
-	filepath = os.path.join(tmp_dir, f['monitor_node'], "id-" + f['id'] + "." + f['applicationsolution_name'] + \
-			"_" + f['url'].replace("://", "_").replace("/","_") + ".conf")
+	filepath = os.path.join(tmp_dir, f['monitor_node'], f['id'] + ".conf")
 
 	headers = f['headers'].replace('\r\n', '\n').replace(': ', ':').split('\n')
 	h = []
@@ -119,12 +130,37 @@ def writeConfFile(f, response_timeout = "15s", follow_redirects = "true", insecu
 				"\tinsecure_skip_verify = " + insecure_skip_verify + '\n' + \
 				"\t[inputs.url_monitor.headers]\n\t\t" + h_str + '\n')
 
+# 删除已被删除的Url或者修改了monitor_node的Url配置
+def delConf(delobj=[], telegraf_dir=telegraf_dir):
+	nodes = os.listdir(telegraf_dir)
+	if ".git" in nodes:
+		nodes.remove(".git")
+
+	commit = ""
+	for node in nodes:
+		for obj in delobj:
+			#print(obj)
+			delfile = glob.glob(os.path.join(telegraf_dir, node, obj + ".*"))
+			if delfile:
+				os.remove(delfile[0])
+				commit = "delete " + delfile[0] + "\n"
+			#print(delfile)
+	return(commit)
+
 def gitOps(delobj=[], tmp_dir=tmp_dir, telegraf_dir=telegraf_dir, telegraf_git=telegraf_git):
 	if not os.path.isdir(telegraf_dir):
 		repo = git.Repo.clone_from(telegraf_git, telegraf_dir)
 	else:
 		repo = git.Repo(telegraf_dir)
 	g = repo.git
+	try:
+		g.pull("origin", "master")
+	except:
+		print("pull faild")
+
+	
+	commit = ""
+	commit = commit + delConf(delobj, telegraf_dir)
 
 	dirs = os.listdir(tmp_dir)
 	
@@ -133,36 +169,21 @@ def gitOps(delobj=[], tmp_dir=tmp_dir, telegraf_dir=telegraf_dir, telegraf_git=t
 		if not os.path.isdir(os.path.join(telegraf_dir, monit_node)):
 			os.mkdir(os.path.join(telegraf_dir, monit_node))
 
-		try:
-			g.checkout(monit_node)
-		except:
-			g.checkout(b=monit_node)
-		
-		g.pull("origin", monit_node)
-		commit = ""
-
-		for obj in delobj:
-			#print(obj)
-			delfile = glob.glob(os.path.join(telegraf_dir, monit_node, "id-" + obj + ".*"))
-			if delfile:
-				os.remove(delfile[0])
-				commit = "delete " + delfile[0] + "\n"
-			#print(delfile)
-
 		for item in os.listdir(os.path.join(tmp_dir, d)):
 			dest = os.path.join(telegraf_dir, d)
 			destfile = os.path.join(dest, item)
 			if os.path.isfile(destfile):
 				os.remove(destfile)
 			shutil.move(os.path.join(tmp_dir, d, item), dest)
+			print(os.path.join(tmp_dir, d, item) + " -- " + dest)
 			commit = commit + "update " + d + "/" + item + "\n"
 		
-		g.add("--all")
-		try:
-			g.commit(m=commit)
-		except:
-			print(g.status())
-		g.push("origin", monit_node)
+	g.add("--all")
+	try:
+		g.commit(m=commit)
+		g.push("origin", "master")
+	except:
+		print(g.status())
 	
 def run(runtype="time",oid=""):
 	delobj = []
