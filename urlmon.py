@@ -114,6 +114,12 @@ def writeConfFile(f, response_timeout = "15s", follow_redirects = "true", insecu
 	timeout = f['timeout']
 	if timeout == "":
 		timeout = "1"
+	
+	if f['interval'] == "":
+		f['interval'] = "30"
+	if f['failed_count'] == "":
+		f['failed_count'] = "3"
+	
 	with open(filepath, 'w') as fi:
 		fi.write("[[inputs.url_monitor]]\n" + \
 				"\tapp = " + '"' +  f['applicationsolution_name'] + '"\n' + \
