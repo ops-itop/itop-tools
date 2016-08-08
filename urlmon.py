@@ -46,6 +46,7 @@ if not os.path.isdir(tmp_dir):
 	os.mkdir(tmp_dir)
 
 def getDeleted(start_str):
+	# 已删除的对象
 	del_oql = 'SELECT CMDBChangeOpDelete AS c WHERE c.objclass="FunctionalCI" AND c.date > "' + start_str + '"'
 	dels = itop.get('CMDBChangeOpDelete', del_oql)
 	try:
@@ -58,8 +59,12 @@ def getDeleted(start_str):
 		for k,v in deleted.items():
 			objkeys.append(v['fields']['objkey'])
 
+	# 修改了监控节点的对象需要先删除，后新建
+	# 状态更改为offline的需要删除
 	mod_oql = 'SELECT CMDBChangeOpSetAttributeScalar AS c WHERE c.objclass="Url" AND c.attcode="monitor_node" ' + \
-			'AND date > "' + start_str + '"'
+			'AND date > "' + start_str + '" UNION ' + \
+			'SELECT CMDBChangeOpSetAttributeScalar AS c WHERE c.objclass="Url" AND c.attcode="status" ' + \
+			'AND c.newvalue="stock" AND date > "' + start_str + '"'
 	mods = itop.get('CMDBChangeOpSetAttributeScalar', mod_oql)
 	try:
 		modified = mods['objects']
@@ -88,12 +93,12 @@ def getObjByTime(start_str):
 
 	objkeys = "','".join(list(set(objkeys)))
 
-	oql = "SELECT Url AS u WHERE u.id IN ('" + objkeys + "')"
+	oql = "SELECT Url AS u WHERE u.id IN ('" + objkeys + "') AND u.status='production'"
 	data = itop.get('Url', oql)['objects']
 	return(data)
 
 def getObjById(url_id):
-	oql = 'SELECT Url AS u WHERE u.id = "' + url_id + '"'
+	oql = 'SELECT Url AS u WHERE u.id = "' + url_id + '" AND u.status="production"'
 	data = itop.get('Url', oql)['objects']
 	return(data)
 
