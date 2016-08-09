@@ -19,6 +19,6 @@ sed -i "/telegraf-url-monitor/d" /etc/crontab
 cat >>/etc/crontab<<EOF
 
 # telegraf-url-monitor 定时抓取cmdb中url类的修改，提交到git
-*/$interval * * * * root $basedir/urlmon.py &> $basedir/cron.urlmon.log
+*/$interval * * * * root $basedir/urlmon.py &>> $basedir/cron.urlmon.log
 EOF
 
