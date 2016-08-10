@@ -109,13 +109,17 @@ def writeConfFile(f, response_timeout = "15s", follow_redirects = "true", insecu
 
 	filepath = os.path.join(tmp_dir, f['monitor_node'], f['id'] + ".conf")
 
-	headers = f['headers'].replace('\r\n', '\n').replace(': ', ':').split('\n')
+	try:
+		headers = json.loads(f['headers'])
+	except:
+		headers = {}
 	h = []
-	for header in headers:
-		if header != "":
-			h.append(header.replace(":", ' = "', 1) + '"')
+	for k,v in headers.items():
+		if k != "":
+			h.append(k + ' = "' + v + '"')
 	h_str = "\n\t\t".join(h)
 	
+	print(h_str)
 	timeout = f['timeout']
 	if timeout == "":
 		timeout = "1"
