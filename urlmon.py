@@ -115,6 +115,7 @@ def writeConfFile(f, response_timeout = "15s", follow_redirects = "true", insecu
 		headers = {}
 	h = []
 	for k,v in headers.items():
+		k = k.replace(' ','')
 		if k != "":
 			h.append(k + ' = "' + v + '"')
 	h_str = "\n\t\t".join(h)
