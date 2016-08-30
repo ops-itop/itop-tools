@@ -133,6 +133,7 @@ def writeConfFile(f, response_timeout = "15s", follow_redirects = "true", insecu
 	with open(filepath, 'w') as fi:
 		fi.write("[[inputs.url_monitor]]\n" + \
 				"\tapp = " + '"' +  f['applicationsolution_name'] + '"\n' + \
+				"\tcmdbid = " + '"' +  f['id'] + '"\n' + \
 				"\taddress = " + '"' + f['url'] + '"\n' + \
 				"\tinterval = " + '"' + f['interval'] + 's"\n' + \
 				"\tresponse_timeout = \"" + response_timeout + '"\n' + \
