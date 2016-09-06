@@ -138,12 +138,12 @@ def writeConfFile(f, response_timeout = "15s", follow_redirects = "true", insecu
 				"\tinterval = " + '"' + f['interval'] + 's"\n' + \
 				"\tresponse_timeout = \"" + response_timeout + '"\n' + \
 				"\tmethod = " + '"' + f['method'] + '"\n' + \
-				"\trequire_str = " + "'" + f['require_str'] + "'\n" + \
-				"\trequire_code = " + "'" + f['require_code'] + "'\n" + \
+				"\trequire_str = " + "'''\n" + f['require_str'] + "\n'''\n" + \
+				"\trequire_code = " + "'''\n" + f['require_code'] + "\n'''\n" + \
 				"\tfailed_count = " + f['failed_count'] + '\n' + \
 				"\tfailed_timeout = " + str("%.2f" % float(timeout)) + '\n' + \
 				"\tfollow_redirects = " + follow_redirects + '\n' + \
-				"\tbody = " + "'" + f['body'] + "'\n" + \
+				"\tbody = " + "'''\n" + f['body'] + "\n'''\n" + \
 				"\tinsecure_skip_verify = " + insecure_skip_verify + '\n' + \
 				"\t[inputs.url_monitor.headers]\n\t\t" + h_str + '\n')
 
