@@ -130,6 +130,10 @@ def writeConfFile(f, response_timeout = "15s", follow_redirects = "true", insecu
 	if f['failed_count'] == "":
 		f['failed_count'] = "3"
 	
+	f['require_str'] = f['require_str'].replace("'''", "")
+	f['require_code'] = f['require_code'].replace("'''", "")
+	f['body'] = f['body'].replace("'''", "")
+
 	with open(filepath, 'w') as fi:
 		fi.write("[[inputs.url_monitor]]\n" + \
 				"\tapp = " + '"' +  f['applicationsolution_name'] + '"\n' + \
