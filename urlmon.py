@@ -133,6 +133,7 @@ def writeConfFile(f, response_timeout = "15s", follow_redirects = "true", insecu
 	f['require_str'] = f['require_str'].replace("'''", "")
 	f['require_code'] = f['require_code'].replace("'''", "")
 	f['body'] = f['body'].replace("'''", "")
+	f['params'] = f['params'].replace("'''", "")
 
 	with open(filepath, 'w') as fi:
 		fi.write("[[inputs.url_monitor]]\n" + \
@@ -147,6 +148,7 @@ def writeConfFile(f, response_timeout = "15s", follow_redirects = "true", insecu
 				"\tfailed_count = " + f['failed_count'] + '\n' + \
 				"\tfailed_timeout = " + str("%.2f" % float(timeout)) + '\n' + \
 				"\tfollow_redirects = " + follow_redirects + '\n' + \
+				"\tparams = " + "'''\n" + f['params'] + "\n'''\n" + \
 				"\tbody = " + "'''\n" + f['body'] + "\n'''\n" + \
 				"\tinsecure_skip_verify = " + insecure_skip_verify + '\n' + \
 				"\t[inputs.url_monitor.headers]\n\t\t" + h_str + '\n')
